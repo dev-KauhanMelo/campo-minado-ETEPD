@@ -7,7 +7,7 @@ Campo Minado web público para os alunos e comunidade da ETE Porto Digital, com 
 - **Frontend:** React + Tailwind CSS v4 + Vite
 - **Backend (lógica do jogo):** Python + FastAPI
 - **Banco de dados (ranking):** Firestore
-- **Deploy:** Firebase Hosting (frontend) + serviço a definir para o backend Python
+- **Deploy:** Firebase Hosting (frontend) + Render (backend)
 
 ## Estrutura
 
@@ -56,6 +56,50 @@ source venv/bin/activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
+
+## Deploy
+
+**Por que Render para o backend:** entre Render/Railway/Fly.io (citados no
+briefing), o Render foi escolhido por ter o setup mais simples para uma API
+Python simples como essa — detecta o `runtime: python` automaticamente, tem
+free tier sem cartão de crédito, e o `render.yaml` na raiz já descreve o
+serviço (blueprint) — depois é só conectar o repositório.
+
+### Backend (Render)
+
+1. Crie uma conta em [render.com](https://render.com) e conecte este
+   repositório GitHub.
+2. Render > New > Blueprint, aponte para este repo — ele lê `render.yaml`
+   automaticamente (build: `pip install -r requirements.txt`, start:
+   `uvicorn app.main:app --host 0.0.0.0 --port $PORT`, `rootDir: backend`).
+3. Quando pedir a variável `FRONTEND_ORIGINS`, deixe em branco por enquanto
+   (volta nesse passo depois do deploy do frontend, no passo 4 abaixo).
+4. Depois do deploy, copie a URL pública (algo como
+   `https://campo-minado-etepd-backend.onrender.com`).
+
+### Frontend (Firebase Hosting)
+
+1. `npm install -g firebase-tools` (uma vez só) e `firebase login`.
+2. Edite [.firebaserc](.firebaserc) trocando o `default` pelo ID real do seu
+   projeto Firebase (ou rode `firebase use --add`).
+3. Em `frontend/.env` (produção), aponte `VITE_API_URL` para a URL do
+   Render do passo anterior, e preencha as credenciais do Firebase (veja a
+   seção acima).
+4. Build + deploy:
+   ```bash
+   cd frontend
+   npm run build
+   cd ..
+   firebase deploy --only hosting,firestore:rules
+   ```
+5. Copie o domínio publicado (`https://<projeto>.web.app`) e volte no
+   Render para preencher `FRONTEND_ORIGINS` com esse domínio (o backend só
+   aceita requisições CORS de origens explicitamente permitidas —
+   `app/main.py` lê essa variável).
+
+`firebase.json` já configura o Hosting para servir `frontend/dist` com
+rewrite de SPA (todas as rotas caem em `index.html`, necessário para o
+React Router funcionar em URLs diretas como `/ranking`).
 
 ## Decisões de arquitetura
 

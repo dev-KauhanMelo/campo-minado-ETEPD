@@ -24,4 +24,8 @@ backend/.pytest_cache/
 *.log
 npm-debug.log*
 
+# Firebase CLI
+.firebase/
+firebase-debug.log
+
 .claude/
