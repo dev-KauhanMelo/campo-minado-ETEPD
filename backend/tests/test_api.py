@@ -1,3 +1,6 @@
+import time
+
+import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -109,6 +112,67 @@ class TestFlag:
             "/game/flag", json={"game_id": "nao-existe", "row": 0, "col": 0}
         )
         assert response.status_code == 404
+
+
+class TestPause:
+    def test_pause_freezes_the_timer_and_resume_continues_it(self):
+        game = start_game("facil")
+        game_id = game["game_id"]
+        client.post("/game/reveal", json={"game_id": game_id, "row": 4, "col": 4})
+
+        paused = client.post("/game/pause", json={"game_id": game_id}).json()
+        assert paused["paused"] is True
+        frozen = paused["elapsed_seconds"]
+
+        time.sleep(0.15)
+        assert client.get(f"/game/{game_id}").json()["elapsed_seconds"] == frozen
+
+        resumed = client.post("/game/resume", json={"game_id": game_id}).json()
+        assert resumed["paused"] is False
+        # O tempo parado não pode ter sido contado no cronômetro.
+        assert resumed["elapsed_seconds"] == pytest.approx(frozen, abs=0.05)
+
+    def test_moves_are_rejected_while_paused(self):
+        game = start_game("facil")
+        game_id = game["game_id"]
+        client.post("/game/reveal", json={"game_id": game_id, "row": 4, "col": 4})
+        client.post("/game/pause", json={"game_id": game_id})
+
+        assert (
+            client.post(
+                "/game/reveal", json={"game_id": game_id, "row": 0, "col": 0}
+            ).status_code
+            == 409
+        )
+        assert (
+            client.post(
+                "/game/flag", json={"game_id": game_id, "row": 0, "col": 0}
+            ).status_code
+            == 409
+        )
+
+        client.post("/game/resume", json={"game_id": game_id})
+        assert (
+            client.post(
+                "/game/flag", json={"game_id": game_id, "row": 0, "col": 0}
+            ).status_code
+            == 200
+        )
+
+    def test_pause_before_first_move_keeps_timer_unstarted(self):
+        game = start_game("facil")
+        data = client.post("/game/pause", json={"game_id": game["game_id"]}).json()
+        assert data["paused"] is False
+        assert data["elapsed_seconds"] is None
+
+    def test_unknown_game_id_returns_404(self):
+        assert (
+            client.post("/game/pause", json={"game_id": "nao-existe"}).status_code == 404
+        )
+        assert (
+            client.post("/game/resume", json={"game_id": "nao-existe"}).status_code
+            == 404
+        )
 
 
 class TestGetGame:

@@ -7,6 +7,10 @@ class StartGameRequest(BaseModel):
     difficulty: Difficulty
 
 
+class GameIdRequest(BaseModel):
+    game_id: str
+
+
 class CellPositionRequest(BaseModel):
     game_id: str
     row: int
@@ -26,6 +30,7 @@ class GameStateResponse(BaseModel):
     cols: int
     mine_count: int
     status: str
+    paused: bool = False
     flags_remaining: int
     elapsed_seconds: float | None = None
     cells: list[list[CellView]]
