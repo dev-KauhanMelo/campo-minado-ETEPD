@@ -9,7 +9,7 @@ const RankingPage = lazy(() => import('./pages/RankingPage'))
 
 function PageFallback() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-bg">
+    <main className="flex min-h-screen items-center justify-center">
       <p className="font-body text-ink-soft">Carregando…</p>
     </main>
   )

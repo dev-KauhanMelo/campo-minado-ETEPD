@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 
-const COLORS = ['#8FE3B5', '#FFD166', '#FF5A5F', '#6C5CE7', '#3B82F6', '#22A559']
-const PARTICLE_COUNT = 40
+const COLORS = ['#FFC93C', '#AAD751', '#FF8A5B', '#7C5CFF', '#4ADE80', '#E5C29F']
+const PARTICLE_COUNT = 60
 
 function randomBetween(min, max) {
   return min + Math.random() * (max - min)

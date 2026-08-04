@@ -18,9 +18,13 @@ const SAVE_TIMEOUT_MS = 10_000
 // configurado ou inacessível — ele fica tentando reconectar
 // indefinidamente. Sem esse timeout, o botão "Salvando…" ficaria preso
 // para sempre nesse cenário.
-export function saveScore({ playerName, difficulty, timeSeconds }) {
+export function saveScore({ playerName, grade, className, difficulty, timeSeconds }) {
   const write = addDoc(collection(db, SCORES_COLLECTION), {
     playerName,
+    // Campos opcionais: as regras do Firestore rejeitam string vazia com
+    // tamanho inválido, então só mandamos quando o jogador preencheu.
+    ...(grade ? { grade } : {}),
+    ...(className ? { className } : {}),
     difficulty,
     timeSeconds,
     createdAt: serverTimestamp(),

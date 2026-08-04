@@ -1,45 +1,18 @@
-import { useRef } from 'react'
-
 import { NUM_TEXT_CLASS } from '../lib/numberColors'
 
-const LONG_PRESS_MS = 450
+function Cell({ cell, row, col, checker, size, selected, onActivate, onFlag, interactive }) {
+  const isRevealed = cell.state === 'revealed'
+  const isFlagged = cell.state === 'flagged'
 
-function Cell({ cell, row, col, checker, onReveal, onToggleFlag, interactive }) {
-  const pressTimer = useRef(null)
-  const longPressFired = useRef(false)
-
-  function clearTimer() {
-    if (pressTimer.current) {
-      clearTimeout(pressTimer.current)
-      pressTimer.current = null
-    }
-  }
-
-  function handleTouchStart() {
+  function handleClick(event) {
     if (!interactive) return
-    longPressFired.current = false
-    pressTimer.current = setTimeout(() => {
-      longPressFired.current = true
-      onToggleFlag(row, col)
-    }, LONG_PRESS_MS)
-  }
-
-  function handleClick() {
-    if (!interactive) return
-    if (longPressFired.current) {
-      longPressFired.current = false
-      return
-    }
-    onReveal(row, col)
+    onActivate(row, col, event.currentTarget.getBoundingClientRect())
   }
 
   function handleContextMenu(event) {
     event.preventDefault()
-    if (interactive) onToggleFlag(row, col)
+    if (interactive) onFlag(row, col)
   }
-
-  const isRevealed = cell.state === 'revealed'
-  const isFlagged = cell.state === 'flagged'
 
   let bg = checker ? 'bg-cell-closed-a' : 'bg-cell-closed-b'
   if (isRevealed) {
@@ -51,17 +24,21 @@ function Cell({ cell, row, col, checker, onReveal, onToggleFlag, interactive }) 
       type="button"
       onClick={handleClick}
       onContextMenu={handleContextMenu}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={clearTimer}
-      onTouchCancel={clearTimer}
-      className={`flex size-8 shrink-0 items-center justify-center rounded-[4px] text-sm font-extrabold transition active:scale-90 ${bg}`}
+      aria-label={`Linha ${row + 1}, coluna ${col + 1}`}
+      style={{
+        width: size,
+        height: size,
+        fontSize: Math.round(size * 0.56),
+        borderRadius: Math.max(4, Math.round(size * 0.16)),
+      }}
+      className={`no-touch-callout flex shrink-0 items-center justify-center font-extrabold leading-none transition active:scale-90 ${bg} ${
+        selected ? 'ring-4 ring-accent' : ''
+      }`}
     >
-      {isFlagged && <span className="text-flag">⚑</span>}
-      {isRevealed && cell.is_mine && '💣'}
+      {isFlagged && <span>🚩</span>}
+      {isRevealed && cell.is_mine && <span>💣</span>}
       {isRevealed && !cell.is_mine && cell.adjacent_mines > 0 && (
-        <span className={NUM_TEXT_CLASS[cell.adjacent_mines]}>
-          {cell.adjacent_mines}
-        </span>
+        <span className={NUM_TEXT_CLASS[cell.adjacent_mines]}>{cell.adjacent_mines}</span>
       )}
     </button>
   )

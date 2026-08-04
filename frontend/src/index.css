@@ -4,40 +4,54 @@
   --font-display: "Baloo 2", ui-rounded, sans-serif;
   --font-body: "Nunito", system-ui, sans-serif;
 
-  --color-bg: #fdf6ec;
-  --color-surface: #ffffff;
-  --color-ink: #2d3142;
-  --color-ink-soft: #6b7280;
+  /* Fundo verde profundo — a tela antiga era quase toda branca/bege e
+     ficava lavada; agora o branco só aparece em detalhes. */
+  --color-bg: #0d3b26;
+  --color-bg-deep: #082a1a;
+  --color-panel: #12603a;
+  --color-panel-soft: #17784a;
+  --color-panel-line: #2ea36a;
 
-  --color-accent: #6c5ce7;
-  --color-accent-soft: #ede9fe;
+  --color-ink: #f2fdf7;
+  --color-ink-soft: #a9d9be;
+  --color-ink-dark: #0c2b1c;
 
-  --color-cell-closed-a: #8fe3b5;
-  --color-cell-closed-b: #7fd9a8;
-  --color-cell-open-a: #f6ecd2;
-  --color-cell-open-b: #efe3c0;
+  --color-accent: #ffc93c;
+  --color-accent-dark: #e2a600;
+  --color-accent-soft: #fff2c9;
+  --color-berry: #7c5cff;
+  --color-tangerine: #ff8a5b;
 
-  --color-flag: #ff5a5f;
-  --color-mine: #2d3142;
-  --color-mine-bg-hit: #ff8a80;
-  --color-danger: #ef4444;
-  --color-success: #22a559;
+  /* Tabuleiro no estilo "grama e terra" do Campo Minado do Google. */
+  --color-cell-closed-a: #aad751;
+  --color-cell-closed-b: #a2d149;
+  --color-cell-open-a: #e5c29f;
+  --color-cell-open-b: #d7b899;
 
-  --color-gold: #ffd166;
-  --color-silver: #d9d9e3;
-  --color-bronze: #e0a96d;
+  --color-flag: #e53935;
+  --color-mine: #1b1b1b;
+  --color-mine-bg-hit: #ef5350;
+  --color-danger: #ff6b6b;
+  --color-success: #4ade80;
 
-  --color-num-1: #3b82f6;
-  --color-num-2: #22a559;
-  --color-num-3: #ef4444;
-  --color-num-4: #7c3aed;
-  --color-num-5: #c2410c;
-  --color-num-6: #0891b2;
-  --color-num-7: #1e1b29;
-  --color-num-8: #6b7280;
+  --color-gold: #ffd54f;
+  --color-silver: #d7dee3;
+  --color-bronze: #d99058;
+
+  --color-num-1: #1976d2;
+  --color-num-2: #2e7d32;
+  --color-num-3: #d32f2f;
+  --color-num-4: #7b1fa2;
+  --color-num-5: #ef6c00;
+  --color-num-6: #0097a7;
+  --color-num-7: #37474f;
+  --color-num-8: #6d4c41;
 
   --animate-confetti-fall: confetti-fall linear forwards;
   --animate-shake: shake 0.4s ease-in-out;
+  --animate-pop-in: pop-in 0.16s ease-out;
+  --animate-rise: rise 0.35s ease-out both;
+  --animate-float: float 3.5s ease-in-out infinite;
 }
 
 @keyframes confetti-fall {
@@ -70,6 +84,38 @@
   }
 }
 
+@keyframes pop-in {
+  from {
+    transform: scale(0.82);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
 html,
 body,
 #root {
@@ -79,6 +125,18 @@ body,
 body {
   margin: 0;
   font-family: var(--font-body);
-  background-color: var(--color-bg);
   color: var(--color-ink);
+  background-color: var(--color-bg);
+  background-image:
+    radial-gradient(circle at 15% 0%, #1d7a4a 0%, transparent 45%),
+    radial-gradient(circle at 85% 100%, #14603a 0%, transparent 50%);
+  background-attachment: fixed;
+}
+
+/* Evita que um toque demorado no tabuleiro abra o menu de seleção do
+   sistema no celular, que atrapalhava marcar bandeira. */
+.no-touch-callout {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }

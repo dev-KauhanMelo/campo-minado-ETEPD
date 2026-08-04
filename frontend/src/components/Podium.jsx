@@ -1,9 +1,9 @@
 const PODIUM_ORDER = [2, 1, 3] // exibição: 2º à esquerda, 1º ao centro, 3º à direita
 
 const PODIUM_STYLES = {
-  1: { height: 'h-32', bg: 'bg-gold', label: '1º' },
-  2: { height: 'h-24', bg: 'bg-silver', label: '2º' },
-  3: { height: 'h-20', bg: 'bg-bronze', label: '3º' },
+  1: { height: 'h-28', bg: 'bg-gold', ring: 'border-gold', badge: '👑', label: '1º' },
+  2: { height: 'h-20', bg: 'bg-silver', ring: 'border-silver', badge: '2', label: '2º' },
+  3: { height: 'h-16', bg: 'bg-bronze', ring: 'border-bronze', badge: '3', label: '3º' },
 }
 
 function formatTime(totalSeconds) {
@@ -13,24 +13,43 @@ function formatTime(totalSeconds) {
   return `${mm}:${ss}`
 }
 
+function describeClass(entry) {
+  return [entry?.grade, entry?.className].filter(Boolean).join(' ')
+}
+
 function Podium({ entries }) {
   const byPosition = { 1: entries[0], 2: entries[1], 3: entries[2] }
+  // Com menos de três colocados, degraus vazios ficavam soltos na tela —
+  // melhor mostrar só quem existe.
+  const visible = PODIUM_ORDER.filter((position) => byPosition[position])
 
   return (
-    <div className="mt-4 flex items-end justify-center gap-2">
-      {PODIUM_ORDER.map((position) => {
+    <div className="mt-5 flex items-end justify-center gap-2">
+      {visible.map((position) => {
         const entry = byPosition[position]
         const style = PODIUM_STYLES[position]
+        const turma = describeClass(entry)
+
         return (
-          <div key={position} className="flex w-24 flex-col items-center gap-1">
+          <div key={position} className="flex w-1/3 flex-col items-center gap-1">
+            <div
+              className={`flex size-12 items-center justify-center rounded-full border-4 bg-panel-soft font-display text-lg font-extrabold text-ink ${style.ring}`}
+            >
+              {style.badge}
+            </div>
             <span className="w-full truncate text-center font-body text-sm font-bold text-ink">
-              {entry ? entry.playerName : '—'}
+              {entry.playerName}
             </span>
-            <span className="font-body text-xs text-ink-soft">
-              {entry ? formatTime(entry.timeSeconds) : ''}
+            {turma && (
+              <span className="w-full truncate text-center font-body text-[11px] text-ink-soft">
+                {turma}
+              </span>
+            )}
+            <span className="font-display text-sm font-bold text-accent tabular-nums">
+              {formatTime(entry.timeSeconds)}
             </span>
             <div
-              className={`flex w-full ${style.height} items-start justify-center rounded-t-xl ${style.bg} pt-2 font-display text-lg font-extrabold text-ink`}
+              className={`flex w-full ${style.height} items-start justify-center rounded-t-2xl ${style.bg} pt-2 font-display text-xl font-extrabold text-ink-dark shadow-lg`}
             >
               {style.label}
             </div>
