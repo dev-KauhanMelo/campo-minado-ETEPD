@@ -23,8 +23,29 @@ backend/    # API FastAPI com a lógica do jogo
 ```bash
 cd frontend
 npm install
+cp .env.example .env   # preencha as credenciais do Firebase (veja abaixo)
 npm run dev
 ```
+
+#### Configurando o Firebase (ranking)
+
+O ranking usa o Firestore diretamente do frontend, sem passar pelo backend
+Python. Para rodar localmente com o ranking funcionando:
+
+1. Crie um projeto em [console.firebase.google.com](https://console.firebase.google.com).
+2. Ative o **Firestore Database** (modo produção).
+3. Em *Configurações do projeto > Seus apps*, registre um app Web e copie o
+   objeto de configuração do SDK.
+4. Cole os valores em `frontend/.env` (a partir de `.env.example`):
+   `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`,
+   `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_STORAGE_BUCKET`,
+   `VITE_FIREBASE_MESSAGING_SENDER_ID`, `VITE_FIREBASE_APP_ID`.
+5. Publique as regras de segurança em [firestore.rules](firestore.rules):
+   `firebase deploy --only firestore:rules` (requer a Firebase CLI e
+   `firebase init` apontando para este projeto).
+
+Sem essas variáveis preenchidas, o resto do jogo funciona normalmente —
+só o "Salvar no ranking" e a tela de Ranking não vão funcionar.
 
 ### Backend
 

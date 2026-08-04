@@ -1,0 +1,28 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Ranking público: qualquer pessoa pode ler e adicionar um resultado,
+    // já que não há sistema de login (nome é auto-declarado). Para
+    // preservar a integridade do ranking, resultados não podem ser
+    // editados nem apagados depois de salvos, e o formato do documento é
+    // validado no próprio create.
+    match /scores/{scoreId} {
+      allow read: if true;
+
+      allow create: if
+        request.resource.data.keys().hasOnly(
+          ['playerName', 'difficulty', 'timeSeconds', 'createdAt']
+        ) &&
+        request.resource.data.playerName is string &&
+        request.resource.data.playerName.size() > 0 &&
+        request.resource.data.playerName.size() <= 24 &&
+        request.resource.data.difficulty in ['facil', 'medio', 'dificil'] &&
+        request.resource.data.timeSeconds is number &&
+        request.resource.data.timeSeconds > 0 &&
+        request.resource.data.createdAt == request.time;
+
+      allow update, delete: if false;
+    }
+  }
+}

@@ -110,6 +110,7 @@ function GamePage() {
           status={game.status}
           difficulty={game.difficulty}
           elapsedSeconds={game.elapsed_seconds}
+          playerName={playerName}
         />
       )}
 

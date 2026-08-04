@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
+import { saveScore } from '../lib/ranking'
 import Confetti from './Confetti'
 
 const DIFFICULTY_LABELS = {
@@ -15,8 +17,19 @@ function formatTime(totalSeconds) {
   return `${mm}:${ss}`
 }
 
-function GameOverPanel({ status, difficulty, elapsedSeconds }) {
+function GameOverPanel({ status, difficulty, elapsedSeconds, playerName }) {
   const won = status === 'won'
+  const [saveState, setSaveState] = useState('idle') // idle | saving | saved | error
+
+  async function handleSave() {
+    setSaveState('saving')
+    try {
+      await saveScore({ playerName, difficulty, timeSeconds: elapsedSeconds })
+      setSaveState('saved')
+    } catch {
+      setSaveState('error')
+    }
+  }
 
   return (
     <div
@@ -32,6 +45,31 @@ function GameOverPanel({ status, difficulty, elapsedSeconds }) {
         <span>⏱ {formatTime(elapsedSeconds)}</span>
         <span>{DIFFICULTY_LABELS[difficulty] ?? difficulty}</span>
       </div>
+
+      {won && (
+        <div className="w-full">
+          {saveState === 'saved' ? (
+            <p className="font-body text-sm font-semibold text-success">
+              Resultado salvo no ranking! ✅
+            </p>
+          ) : (
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={saveState === 'saving'}
+              className="w-full rounded-full bg-gold px-6 py-3 font-display font-bold text-ink shadow transition active:scale-95 disabled:opacity-60"
+            >
+              {saveState === 'saving' ? 'Salvando…' : `Salvar como "${playerName}"`}
+            </button>
+          )}
+          {saveState === 'error' && (
+            <p className="mt-1 font-body text-sm text-danger">
+              Não foi possível salvar. Tente novamente.
+            </p>
+          )}
+        </div>
+      )}
+
       <div className="mt-2 flex w-full flex-col gap-3">
         <Link
           to="/novo-jogo"
