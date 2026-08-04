@@ -12,11 +12,22 @@ service cloud.firestore {
 
       allow create: if
         request.resource.data.keys().hasOnly(
+          ['playerName', 'grade', 'className', 'difficulty', 'timeSeconds', 'createdAt']
+        ) &&
+        request.resource.data.keys().hasAll(
           ['playerName', 'difficulty', 'timeSeconds', 'createdAt']
         ) &&
         request.resource.data.playerName is string &&
         request.resource.data.playerName.size() > 0 &&
         request.resource.data.playerName.size() <= 24 &&
+        // Série e turma são opcionais (quem não informar entra só com o
+        // nome), mas quando vierem precisam ser texto curto.
+        (!('grade' in request.resource.data) ||
+          (request.resource.data.grade is string &&
+           request.resource.data.grade.size() <= 12)) &&
+        (!('className' in request.resource.data) ||
+          (request.resource.data.className is string &&
+           request.resource.data.className.size() <= 16)) &&
         request.resource.data.difficulty in ['facil', 'medio', 'dificil'] &&
         request.resource.data.timeSeconds is number &&
         request.resource.data.timeSeconds > 0 &&
