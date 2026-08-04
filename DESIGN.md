@@ -23,6 +23,7 @@ Pastel vibrante/saturado (mais intenso que pastel tradicional), com checkerboard
 | `flag` | Bandeira | `#FF5A5F` |
 | `mine` | Bomba | `#2D3142` |
 | `mine-bg-hit` | Fundo da célula que causou a derrota | `#FF8A80` |
+| `danger` | Mensagens de erro/validação em formulários | `#EF4444` |
 | `gold` / `silver` / `bronze` | Pódio do ranking | `#FFD166` / `#D9D9E3` / `#E0A96D` |
 
 **Números por quantidade de bombas vizinhas** (aparecem só sobre célula revelada — bege claro —, então todos foram escolhidos com contraste alto contra `cell-open-*`):
