@@ -90,20 +90,22 @@ function GamePage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center gap-4 bg-bg px-4 py-6">
-      <div className="flex w-full max-w-2xl items-center justify-between">
-        <span className="font-body text-sm text-ink-soft">{playerName}</span>
-        <div className="flex items-center gap-4 font-display font-bold text-ink">
-          <span>🚩 {game.flags_remaining}</span>
-          <span>⏱ {formatTime(displayElapsed)}</span>
+      <div className="mx-auto flex w-fit max-w-full flex-col gap-4">
+        <div className="flex items-center justify-between gap-4">
+          <span className="font-body text-sm text-ink-soft">{playerName}</span>
+          <div className="flex items-center gap-4 font-display font-bold text-ink">
+            <span>🚩 {game.flags_remaining}</span>
+            <span>⏱ {formatTime(displayElapsed)}</span>
+          </div>
         </div>
-      </div>
 
-      <Board
-        cells={game.cells}
-        onReveal={handleReveal}
-        onToggleFlag={handleToggleFlag}
-        interactive={game.status === 'in_progress'}
-      />
+        <Board
+          cells={game.cells}
+          onReveal={handleReveal}
+          onToggleFlag={handleToggleFlag}
+          interactive={game.status === 'in_progress'}
+        />
+      </div>
 
       {game.status !== 'in_progress' && (
         <GameOverPanel

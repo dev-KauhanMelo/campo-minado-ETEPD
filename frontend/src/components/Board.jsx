@@ -4,10 +4,10 @@ function Board({ cells, onReveal, onToggleFlag, interactive }) {
   const cols = cells[0]?.length ?? 0
 
   return (
-    <div className="w-full overflow-x-auto rounded-xl bg-surface p-2 shadow-inner">
+    <div className="w-fit max-w-full overflow-x-auto rounded-xl bg-surface p-2 shadow-inner">
       <div
         className="grid w-fit gap-[2px]"
-        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 2rem))` }}
+        style={{ gridTemplateColumns: `repeat(${cols}, 2rem)` }}
       >
         {cells.map((rowCells, row) =>
           rowCells.map((cell, col) => (
