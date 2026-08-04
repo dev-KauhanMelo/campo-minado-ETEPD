@@ -1,5 +1,40 @@
 @import "tailwindcss";
 
+@theme {
+  --font-display: "Baloo 2", ui-rounded, sans-serif;
+  --font-body: "Nunito", system-ui, sans-serif;
+
+  --color-bg: #fdf6ec;
+  --color-surface: #ffffff;
+  --color-ink: #2d3142;
+  --color-ink-soft: #6b7280;
+
+  --color-accent: #6c5ce7;
+  --color-accent-soft: #ede9fe;
+
+  --color-cell-closed-a: #8fe3b5;
+  --color-cell-closed-b: #7fd9a8;
+  --color-cell-open-a: #f6ecd2;
+  --color-cell-open-b: #efe3c0;
+
+  --color-flag: #ff5a5f;
+  --color-mine: #2d3142;
+  --color-mine-bg-hit: #ff8a80;
+
+  --color-gold: #ffd166;
+  --color-silver: #d9d9e3;
+  --color-bronze: #e0a96d;
+
+  --color-num-1: #3b82f6;
+  --color-num-2: #22a559;
+  --color-num-3: #ef4444;
+  --color-num-4: #7c3aed;
+  --color-num-5: #c2410c;
+  --color-num-6: #0891b2;
+  --color-num-7: #1e1b29;
+  --color-num-8: #6b7280;
+}
+
 html,
 body,
 #root {
@@ -8,4 +43,7 @@ body,
 
 body {
   margin: 0;
+  font-family: var(--font-body);
+  background-color: var(--color-bg);
+  color: var(--color-ink);
 }
