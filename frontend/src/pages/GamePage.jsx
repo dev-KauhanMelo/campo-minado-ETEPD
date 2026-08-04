@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 
 import Board from '../components/Board'
+import GameOverPanel from '../components/GameOverPanel'
 import { getGame, revealCell, toggleFlag } from '../lib/api'
 
 function formatTime(totalSeconds) {
@@ -105,9 +106,11 @@ function GamePage() {
       />
 
       {game.status !== 'in_progress' && (
-        <p className="font-display text-xl font-bold text-ink">
-          {game.status === 'won' ? 'Você venceu! 🎉' : 'Você perdeu 💥'}
-        </p>
+        <GameOverPanel
+          status={game.status}
+          difficulty={game.difficulty}
+          elapsedSeconds={game.elapsed_seconds}
+        />
       )}
 
       {error && <p className="font-body text-sm text-danger">{error}</p>}
