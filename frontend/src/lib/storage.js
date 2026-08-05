@@ -4,6 +4,10 @@
 const PROFILE_KEY = 'campo-minado:perfil'
 const CURRENT_GAME_KEY = 'campo-minado:jogo-atual'
 const BESTS_KEY = 'campo-minado:recordes'
+const CONTROLS_KEY = 'campo-minado:controles'
+
+/** 'botoes' = barra Cavar/Bandeira; 'rapido' = toque cava, segurar marca. */
+export const CONTROL_SCHEMES = ['botoes', 'rapido']
 
 function read(key) {
   try {
@@ -60,6 +64,20 @@ export function saveCurrentGame({ gameId, difficulty }) {
 
 export function clearCurrentGame() {
   remove(CURRENT_GAME_KEY)
+}
+
+export function loadControlScheme() {
+  const saved = read(CONTROLS_KEY)
+  return CONTROL_SCHEMES.includes(saved) ? saved : 'botoes'
+}
+
+/** false enquanto o jogador nunca escolheu — é o gatilho das boas-vindas. */
+export function isControlSchemeChosen() {
+  return CONTROL_SCHEMES.includes(read(CONTROLS_KEY))
+}
+
+export function saveControlScheme(scheme) {
+  write(CONTROLS_KEY, scheme)
 }
 
 export function loadBests() {

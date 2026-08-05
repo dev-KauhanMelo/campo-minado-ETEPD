@@ -140,11 +140,11 @@ function RankingPage() {
                         {index + 4}º
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate font-body font-bold text-ink">
+                        <span className="block wrap-break-word font-body font-bold leading-tight text-ink">
                           {entry.playerName}
                         </span>
                         {turma && (
-                          <span className="block truncate font-body text-xs text-ink-soft">
+                          <span className="block wrap-break-word font-body text-xs text-ink-soft">
                             {turma}
                           </span>
                         )}

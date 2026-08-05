@@ -1,6 +1,16 @@
 import { useEffect } from 'react'
 
-function PauseMenu({ onResume, onRestart, onExit, restarting }) {
+import ControlPicker from './ControlPicker'
+
+function PauseMenu({
+  onResume,
+  onRestart,
+  onExit,
+  restarting,
+  scheme,
+  onChangeScheme,
+  showControls,
+}) {
   useEffect(() => {
     function handleKey(event) {
       if (event.key === 'Escape') onResume()
@@ -10,8 +20,8 @@ function PauseMenu({ onResume, onRestart, onExit, restarting }) {
   }, [onResume])
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-bg-deep/80 px-6 backdrop-blur-sm">
-      <div className="w-full max-w-xs animate-pop-in rounded-3xl border-4 border-panel-line bg-panel p-6 text-center shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-bg-deep/80 px-6 py-6 backdrop-blur-sm">
+      <div className="my-auto w-full max-w-xs animate-pop-in rounded-3xl border-4 border-panel-line bg-panel p-6 text-center shadow-2xl">
         <p className="font-display text-3xl font-extrabold text-accent">Pausa</p>
         <p className="mt-1 font-body text-sm text-ink-soft">
           O cronômetro está parado.
@@ -41,6 +51,12 @@ function PauseMenu({ onResume, onRestart, onExit, restarting }) {
             🚪 Sair para o menu
           </button>
         </div>
+
+        {showControls && (
+          <div className="mt-5 text-left">
+            <ControlPicker value={scheme} onChange={onChangeScheme} compact />
+          </div>
+        )}
       </div>
     </div>
   )

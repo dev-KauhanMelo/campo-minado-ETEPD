@@ -4,11 +4,15 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import Board from '../components/Board'
 import Credits from '../components/Credits'
 import GameOverPanel from '../components/GameOverPanel'
+import ModeSwitch from '../components/ModeSwitch'
 import PauseMenu from '../components/PauseMenu'
+import { useIsTouch } from '../hooks/useBoardMetrics'
 import { getGame, pauseGame, resumeGame, revealCell, startGame, toggleFlag } from '../lib/api'
 import {
   clearCurrentGame,
+  loadControlScheme,
   loadProfile,
+  saveControlScheme,
   saveCurrentGame,
 } from '../lib/storage'
 
@@ -29,6 +33,14 @@ function GamePage() {
   const { gameId } = useParams()
   const navigate = useNavigate()
   const [profile] = useState(() => loadProfile())
+  const isTouch = useIsTouch()
+  const [scheme, setScheme] = useState(() => loadControlScheme())
+  const [touchMode, setTouchMode] = useState('dig')
+
+  function changeScheme(next) {
+    setScheme(next)
+    saveControlScheme(next)
+  }
 
   const [game, setGame] = useState(null)
   const [error, setError] = useState(null)
@@ -202,7 +214,11 @@ function GamePage() {
   const finished = game.status !== 'in_progress'
 
   return (
-    <main className="flex min-h-screen flex-col items-center gap-4 px-4 py-5">
+    <main
+      className={`flex min-h-screen flex-col items-center gap-4 px-4 py-5 ${
+        isTouch && scheme === 'botoes' && !finished ? 'pb-28' : ''
+      }`}
+    >
       <div className="mx-auto my-auto flex w-fit max-w-full flex-col gap-3">
         <div className="flex min-w-68 items-center justify-between gap-3 rounded-2xl border-2 border-panel-line/60 bg-panel/80 px-3 py-2">
           <button
@@ -240,13 +256,16 @@ function GamePage() {
           onReveal={handleReveal}
           onToggleFlag={handleToggleFlag}
           interactive={!finished && !game.paused && !menuOpen}
+          scheme={scheme}
+          touchMode={touchMode}
         />
 
         <p className="text-center font-body text-xs text-ink-soft">
-          <span className="hidden sm:inline">
-            Clique para cavar · clique direito marca bandeira
-          </span>
-          <span className="sm:hidden">Toque numa casa e escolha cavar ou marcar</span>
+          {!isTouch
+            ? 'Clique para cavar · clique direito marca bandeira'
+            : scheme === 'rapido'
+              ? 'Toque para cavar · segure para marcar bandeira'
+              : 'Escolha embaixo o que o toque faz'}
         </p>
       </div>
 
@@ -266,9 +285,16 @@ function GamePage() {
         </p>
       )}
 
+      {isTouch && scheme === 'botoes' && !finished && !menuOpen && (
+        <ModeSwitch mode={touchMode} onChange={setTouchMode} />
+      )}
+
       {menuOpen && (
         <PauseMenu
           restarting={restarting}
+          scheme={scheme}
+          onChangeScheme={changeScheme}
+          showControls={isTouch}
           onResume={closeMenu}
           onRestart={handleRestart}
           onExit={() => navigate('/')}

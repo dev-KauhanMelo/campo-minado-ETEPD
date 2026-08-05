@@ -2,7 +2,16 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import Credits from '../components/Credits'
-import { loadBests, loadCurrentGame, loadProfile } from '../lib/storage'
+import SettingsModal from '../components/SettingsModal'
+import { useIsTouch } from '../hooks/useBoardMetrics'
+import {
+  isControlSchemeChosen,
+  loadBests,
+  loadControlScheme,
+  loadCurrentGame,
+  loadProfile,
+  saveControlScheme,
+} from '../lib/storage'
 
 const DIFFICULTY_LABELS = {
   facil: 'Fácil',
@@ -21,17 +30,51 @@ function HomePage() {
   const [current, setCurrent] = useState(null)
   const [bests, setBests] = useState({})
   const [profile, setProfile] = useState({ name: '' })
+  const isTouch = useIsTouch()
+  const [scheme, setScheme] = useState('botoes')
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [firstTime, setFirstTime] = useState(false)
 
   useEffect(() => {
     setCurrent(loadCurrentGame())
     setBests(loadBests())
     setProfile(loadProfile())
-  }, [])
+    setScheme(loadControlScheme())
+    // Só pergunta uma vez, e só onde a escolha importa (no toque).
+    if (!isControlSchemeChosen() && isTouch) {
+      setFirstTime(true)
+      setSettingsOpen(true)
+    }
+  }, [isTouch])
+
+  function changeScheme(next) {
+    setScheme(next)
+    saveControlScheme(next)
+  }
+
+  function closeSettings() {
+    // Fechar sem tocar em nada também conta como escolha (fica no padrão),
+    // senão as boas-vindas voltariam a aparecer na próxima visita.
+    saveControlScheme(scheme)
+    setSettingsOpen(false)
+    setFirstTime(false)
+  }
 
   const bestEntries = Object.entries(bests)
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between gap-8 px-5 py-8">
+    <main className="relative flex min-h-screen flex-col items-center justify-between gap-8 px-5 py-8">
+      {isTouch && (
+        <button
+          type="button"
+          onClick={() => setSettingsOpen(true)}
+          aria-label="Configurações"
+          className="absolute right-4 top-4 flex size-11 items-center justify-center rounded-full border-2 border-panel-line bg-panel text-xl shadow-lg transition active:scale-90"
+        >
+          ⚙️
+        </button>
+      )}
+
       <div className="flex w-full max-w-md flex-1 flex-col items-center justify-center gap-8">
         <div className="flex animate-rise flex-col items-center gap-2 text-center sm:flex-row sm:gap-4 sm:text-left">
           <img
@@ -106,6 +149,15 @@ function HomePage() {
       </div>
 
       <Credits />
+
+      {settingsOpen && (
+        <SettingsModal
+          scheme={scheme}
+          firstTime={firstTime}
+          onChangeScheme={changeScheme}
+          onClose={closeSettings}
+        />
+      )}
     </main>
   )
 }

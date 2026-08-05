@@ -60,19 +60,30 @@ Optamos por **(a) ranking separado por dificuldade** (abas Fácil/Médio/Difíci
 
 ## Decisão: como marcar bandeira no celular
 
-A primeira versão usava **toque longo** (~450ms) para marcar bandeira. Testando
-no celular, ficou ruim: não há retorno visual de que o toque está sendo
-contado, é fácil escorregar o dedo e cancelar, e quem não leu a instrução não
-descobre sozinho.
+Esse ponto passou por três versões, todas por causa de teste com gente de
+verdade jogando:
 
-Agora, em aparelhos de toque (`pointer: coarse`), **um toque na casa abre um
-menu com dois botões grandes: "Cavar" e "Marcar"**. Some a ambiguidade — a
-mesma escolha que o mouse faz com os dois botões vira uma escolha explícita no
-toque. No desktop nada muda: clique esquerdo cava, clique direito marca (um
-menu ali só somaria um clique extra).
+1. **Toque longo (~450ms), sozinho.** Ruim: nenhum retorno visual de que a
+   contagem estava rolando, cancelava se o dedo escorregasse, e quem não lia a
+   instrução não descobria.
+2. **Menu em cima da casa** (toque abre "Cavar"/"Marcar"). Resolveu a
+   descoberta, mas cobrava **dois toques por jogada** — cansativo, e foi
+   exatamente a queixa de quem testou.
+3. **Duas opções, escolhidas pelo jogador** — o que está no ar:
+   - **Com botões**: uma barra fixa embaixo (perto do polegar) decide o que o
+     toque faz. Um toque por casa, e o estado fica sempre visível — a borda do
+     tabuleiro fica vermelha no modo bandeira.
+   - **Rápido**: toque cava, segurar marca. É o gesto da primeira versão, mas
+     agora com o que faltava: a casa **afunda progressivamente** enquanto o
+     dedo está pressionando, vibra ao marcar, o limiar caiu para 350ms e sair
+     mais de 12px cancela.
 
-O menu é renderizado em `position: fixed` via portal porque o tabuleiro fica
-dentro de um container com scroll, que cortaria o balão.
+Não dava para escolher por eles: as duas preferências apareceram no mesmo
+teste. A escolha é feita **uma vez**, num modal de boas-vindas na primeira
+visita, e depois só muda na engrenagem da home ou no menu de pausa — perguntar
+a cada partida seria atrito puro.
+
+No desktop nada disso aparece: clique esquerdo cava, direito marca.
 
 ## Decisão: tamanho da célula
 

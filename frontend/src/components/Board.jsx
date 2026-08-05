@@ -1,45 +1,34 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback } from 'react'
 
 import { CELL_GAP, useCellSize, useIsTouch } from '../hooks/useBoardMetrics'
 import Cell from './Cell'
-import CellActionMenu from './CellActionMenu'
 
-function Board({ cells, onReveal, onToggleFlag, interactive }) {
+function Board({ cells, onReveal, onToggleFlag, interactive, touchMode, scheme }) {
   const rows = cells.length
   const cols = cells[0]?.length ?? 0
   const cellSize = useCellSize(rows, cols)
   const isTouch = useIsTouch()
-  const [menu, setMenu] = useState(null)
-
-  const closeMenu = useCallback(() => setMenu(null), [])
-
-  // Um menu aberto sobre um tabuleiro que mudou (ou acabou o jogo)
-  // apontaria para o estado errado.
-  useEffect(() => {
-    if (!interactive) setMenu(null)
-  }, [interactive])
+  const porBotoes = isTouch && scheme === 'botoes'
 
   const handleActivate = useCallback(
-    (row, col, rect) => {
-      const cell = cells[row][col]
-      if (cell.state === 'revealed') return
-
-      if (!isTouch) {
-        onReveal(row, col)
-        return
-      }
-
-      setMenu((current) =>
-        current && current.row === row && current.col === col
-          ? null
-          : { row, col, anchor: rect, flagged: cell.state === 'flagged' },
-      )
+    (row, col) => {
+      if (cells[row][col].state === 'revealed') return
+      // Com a barra de modo, quem manda é o botão escolhido; no esquema
+      // rápido (e no mouse) o toque sempre cava.
+      if (porBotoes && touchMode === 'flag') onToggleFlag(row, col)
+      else onReveal(row, col)
     },
-    [cells, isTouch, onReveal],
+    [cells, porBotoes, touchMode, onReveal, onToggleFlag],
   )
 
+  const flagging = porBotoes && touchMode === 'flag'
+
   return (
-    <div className="w-fit max-w-full overflow-x-auto rounded-2xl border-4 border-panel-line/60 bg-panel-soft p-2 shadow-xl">
+    <div
+      className={`w-fit max-w-full overflow-x-auto rounded-2xl border-4 bg-panel-soft p-2 shadow-xl transition-colors ${
+        flagging ? 'border-flag' : 'border-panel-line/60'
+      }`}
+    >
       <div
         className="grid w-fit"
         style={{
@@ -56,7 +45,7 @@ function Board({ cells, onReveal, onToggleFlag, interactive }) {
               col={col}
               size={cellSize}
               checker={(row + col) % 2 === 0}
-              selected={menu?.row === row && menu?.col === col}
+              longPress={isTouch && scheme === 'rapido'}
               onActivate={handleActivate}
               onFlag={onToggleFlag}
               interactive={interactive}
@@ -64,22 +53,6 @@ function Board({ cells, onReveal, onToggleFlag, interactive }) {
           )),
         )}
       </div>
-
-      {menu && (
-        <CellActionMenu
-          anchor={menu.anchor}
-          flagged={menu.flagged}
-          onClose={closeMenu}
-          onDig={() => {
-            closeMenu()
-            onReveal(menu.row, menu.col)
-          }}
-          onFlag={() => {
-            closeMenu()
-            onToggleFlag(menu.row, menu.col)
-          }}
-        />
-      )}
     </div>
   )
 }
